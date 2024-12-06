@@ -1,0 +1,11 @@
+api:
+  user:
+    base-url: 'url-user-test'
+    paths:
+      validate-token: 'current-user'
+  post:
+    base-url: 'url-post-test'
+    paths:
+      find-by-id: 'param'
+  offer:
+    base-url: 'url-offer-test'

@@ -1,0 +1,265 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rf003
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rf003
+  template:
+    metadata:
+      labels:
+        app: rf003
+    spec:
+      containers:
+        - name: rf003-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/rf003:1.1
+          envFrom:
+            - secretRef:
+                name: rf003-secrets
+          ports:
+            - containerPort: 3006
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: rf003-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3006
+    type: HTTP
+    requestPath: /rf003/ping
+
+---
+
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rf003-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "rf003-config"}'
+spec:
+  selector:
+    app: rf003
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3006
+      nodePort: 32337
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rf004
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rf004
+  template:
+    metadata:
+      labels:
+        app: rf004
+    spec:
+      containers:
+        - name: rf004-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/rf04:1.3
+          envFrom:
+            - secretRef:
+                name: rf004-secrets
+          ports:
+            - containerPort: 3004
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: rf004-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3004
+    type: HTTP
+    requestPath: /rf004/posts/ping
+
+---
+
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rf004-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "rf004-config"}'
+spec:
+  selector:
+    app: rf004
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3004
+      nodePort: 32338
+  type: NodePort
+
+---
+
+# DEPLOY RF005
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rf005
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rf005
+  template:
+    metadata:
+      labels:
+        app: rf005
+    spec:
+      containers:
+        - name: rf005-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/rf005:1.2
+          envFrom:
+            - secretRef:
+                name: rf005-secrets
+          ports:
+            - containerPort: 3005
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: rf005-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3005
+    type: HTTP
+    requestPath: /rf005/ping
+
+---
+
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rf005-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "rf005-config"}'
+spec:
+  selector:
+    app: rf005
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3005
+      nodePort: 32339
+  type: NodePort
+
+---
+
+# DEPLOY UTILIDAD
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scores
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scores
+  template:
+    metadata:
+      labels:
+        app: scores
+    spec:
+      containers:
+        - name: scores-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/scores:1.2
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3008
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: scores-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3008
+    type: HTTP
+    requestPath: /scores/ping
+
+---
+
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: scores-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "scores-config"}'
+spec:
+  selector:
+    app: scores
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3008
+      nodePort: 32340
+  type: NodePort

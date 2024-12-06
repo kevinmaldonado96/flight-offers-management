@@ -1,0 +1,244 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msusers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: msusers
+  template:
+    metadata:
+      labels:
+        app: msusers
+    spec:
+      containers:
+        - name: msusers-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/msusers:1.0
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3000
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: msusers-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3000
+    type: HTTP
+    requestPath: /users/ping
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users
+  annotations:
+    cloud.google.com/backend-config: '{"default": "msusers-config"}'
+spec:
+  selector:
+    app: msusers
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      nodePort: 32334
+  type: NodePort
+
+---
+
+---
+# Deploy ROUTES
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: routes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routes
+  template:
+    metadata:
+      labels:
+        app: routes
+    spec:
+      containers:
+        - name: routes-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/route:1.1
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3002
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: routes-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3002
+    type: HTTP
+    requestPath: /routes/ping
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: routes-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "routes-config"}'
+spec:
+  selector:
+    app: routes
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3002
+      nodePort: 32335
+  type: NodePort
+
+---
+# Deploy POSTS
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts
+  template:
+    metadata:
+      labels:
+        app: posts
+    spec:
+      containers:
+        - name: posts-contenedor
+          image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/posts:1.2
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3001
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: posts-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3001
+    type: HTTP
+    requestPath: /posts/ping
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "posts-config"}'
+spec:
+  selector:
+    app: posts
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
+      nodePort: 32336
+  type: NodePort
+
+---
+# Deploy OFFERS
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: offers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: offers
+  template:
+    metadata:
+      labels:
+        app: offers
+  resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+  spec:
+     containers:
+       - name: offers-contenedor
+         image: us-central1-docker.pkg.dev/entrega-2-nativas/repo-nativas-imagenes-microservicios/offers:1.1
+         envFrom:
+           - secretRef:
+               name: db-secrets
+         ports:
+           - containerPort: 3003
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: offers-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3003
+    type: HTTP
+    requestPath: /offers/ping
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: offers-kubernates-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "offers-config"}'
+spec:
+  selector:
+    app: offers
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3003
+      nodePort: 32333
+  type: NodePort
+
+---
+

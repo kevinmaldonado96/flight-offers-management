@@ -1,0 +1,15 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    #url: jdbc:postgresql://users_db:5432/monitor_users
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  exposed:
+    show-sql: true
+    generate-ddl: true
+  profiles:
+    active: prd
+server:
+  port: 3000

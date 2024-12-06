@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+psycopg2-binary = "*"
+flask = "*"
+flask-sqlalchemy = "*"
+requests = "*"
+python-dotenv = "*"
+flask-cors = "*"
+pytz = "*"
+marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+faker = "*"
+flask-restful = "*"
+sqlalchemy = "*"
+pytest = "*"
+python-abc = "*"
+psycopg2 = "*"
+pytest-flask = "*"
+pytest-mock = "*"
+pytest-env = "*"
+pytest-cov = "*"

@@ -1,0 +1,164 @@
+name: Pruebas unitarias
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  users:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          java-package: jdk
+          distribution: "temurin" # Specify the desired distribution
+
+      - uses: actions/checkout@v2
+
+      - name: Ejecutar Pruebas unitarias
+        working-directory: ./msusers
+        run: |
+          ./gradlew clean build test jacocoTestReport
+          ./gradlew jacocoTestCoverageVerification
+
+  test_route:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./route
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./route
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./route
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+
+  test_offer:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./offers
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./offers
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./offers
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+
+  test_posts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./offers
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./posts
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./posts
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+
+  test_rf003:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./rf003
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./rf003
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./rf003
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+
+  rf004:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          java-package: jdk
+          distribution: "temurin" # Specify the desired distribution
+
+      - uses: actions/checkout@v2
+
+      - name: Ejecutar Pruebas unitarias
+        working-directory: ./rf04
+        run: |
+          ./gradlew clean build test jacocoTestReport
+          ./gradlew jacocoTestCoverageVerification
+  
+  test_rf005:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./rf005
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./rf005
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./rf005
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+  
+  test_scores:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./score
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./score
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./score
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70

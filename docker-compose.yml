@@ -1,0 +1,192 @@
+version: "3.8"
+
+services:
+  offers:
+    build: ./offers/.
+    ports:
+      - "3003:3003"
+    environment:
+      DB_NAME: monitor_offers
+      DB_HOST: offers_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+    depends_on:
+      offers_db:
+        condition: service_healthy
+    networks:
+      - app_net
+      - offer_net
+
+  offers_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: monitor_offers
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - offer_net
+  users:
+    build: ./msusers/.
+    ports:
+      - "3000:3000"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: S3cr3t
+      DB_HOST: users_db
+      DB_PORT: 5432
+      DB_NAME: ms_user
+      USERS_PATH: http://users:3000
+    depends_on:
+      - users_db
+    networks:
+      - app_net
+      - user_net
+
+  users_db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: S3cr3t
+      POSTGRES_DB: ms_user
+    networks:
+      - user_net
+
+  routes:
+    build: ./route/.
+    ports:
+      - "3002:3002"
+    environment:
+      DB_NAME: monitor_routes
+      DB_HOST: routes_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+    networks:
+      - route_net
+      - app_net
+    depends_on:
+      routes_db:
+        condition: service_healthy
+  routes_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: monitor_routes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - route_net
+
+  posts:
+    build: ./posts/.
+    ports:
+      - "3001:3001"
+    environment:
+      DB_NAME: monitor_posts
+      DB_HOST: posts_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+    networks:
+      - post_net
+      - app_net
+    depends_on:
+      posts_db:
+        condition: service_healthy
+  posts_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: monitor_posts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - post_net
+  rf04:
+    build: ./rf04/.
+    ports:
+      - "3004:3004"
+    networks:
+      - app_net
+    environment:
+      USERS_PATH: "http://users:3000"
+      POSTS_PATH: "http://posts:3001"
+      OFFERS_PATH: "http://offers:3003"
+  rf003:
+    build: ./rf003/.
+    ports:
+      - "3006:3006"
+    networks:
+      - app_net
+
+  rf005:
+    build: ./rf005/.
+    ports:
+      - "3005:3005"
+    environment:
+      USERS_PATH: "http://users:3000"
+      POSTS_PATH: "http://posts:3001"
+      ROUTES_PATH: "http://routes:3002"
+      OFFERS_PATH: "http://offers:3003"
+      SCORE_PATH: "http://scores:3008"
+
+    networks:
+      - rf005_net
+      - app_net
+
+  scores:
+    build: ./score/.
+    ports:
+      - "3008:3008"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: score_db
+      DB_PORT: 5432
+      DB_NAME: ms_score
+      USERS_PATH: "http://users:3000"
+    depends_on:
+      - score_db
+    networks:
+      - app_net
+      - score_net
+
+  score_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: ms_score
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - score_net
+
+networks:
+  offer_net:
+  app_net:
+  user_net:
+  route_net:
+  post_net:
+  rf005_net:
+  score_net:

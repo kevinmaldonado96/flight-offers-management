@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: prd
+server:
+  port: 3004
+api:
+  user:
+    base-url: '${USERS_PATH}/users'
+    paths:
+      validate-token: 'me'
+  post:
+    base-url: '${POSTS_PATH}/posts'
+    paths:
+      find-by-id: '#{post_id}'
+  offer:
+    base-url: '${OFFERS_PATH}/offers'

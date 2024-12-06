@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+faker = "*"
+flask = "*"
+flask-restful = "*"
+requests = "*"
+pytest = "*"
+pytest-flask = "*"
+pytest-mock = "*"
+pytest-env = "*"
+pytest-cov = "*"
+flask-cors = "*"
+python-abc = "*"
+python-dotenv = "*"
